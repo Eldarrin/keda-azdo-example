@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-template-deployment
+  labels:
+    app: agent-template-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agent-template-deployment
+  template:
+    metadata:
+      labels:
+        app: agent-template-deployment
+    spec:
+      containers:
+        - name: agent-template-deployment
+          image: ado-agent-image:latest
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: ado-pat-tokens
+            - configMapRef:
+                name: ado-agent-other-config
+          env:
+            - name: AZP_AGENT_NAME
+              value: agenttype-keda-template
+            - name: AZP_URL
+              value: https://dev.azure.com/yourorg
+            - name: AZP_POOL
+              value: MY-AGENT-POOL
+          securityContext:
+            runAsUser: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL

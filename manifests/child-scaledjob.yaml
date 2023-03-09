@@ -1,0 +1,46 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledJob
+metadata:
+  name: agent-scaledjob
+  labels:
+    app: agent-scaledjob
+spec:
+  jobTargetRef:
+    template:
+      metadata:
+        name: agent-scaledjob
+        labels:
+          app: agent-scaledjob
+      spec:
+        containers:
+          - name: agent-scaledjob
+            image: ado-agent-image:latest
+            imagePullPolicy: IfNotPresent
+            envFrom:
+              - secretRef:
+                  name: ado-pat-tokens
+              - configMapRef:
+                  name: ado-agent-other-config
+            env:
+              - name: AZP_URL
+                value: https://dev.azure.com/yourorg
+              - name: AZP_POOL
+                value: MY-AGENT-POOL
+            securityContext:
+              runAsUser: 1000
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities:
+                drop:
+                  - ALL
+  pollingInterval: 30
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 5
+  maxReplicaCount: 10
+  triggers:
+    - type: azure-pipelines
+      metadata:
+        poolID: "1"
+        organizationURLFromEnv: "AZP_URL"
+        parent: "agenttype-keda-template"

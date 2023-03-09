@@ -1,0 +1,17 @@
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - script: kubectl apply -f manifests/parent-deployment.yaml
+    displayName: 'Create reference container deployment'
+
+  - script: sleep 300
+    displayName: 'Sleep 300 seconds (waits for the parent deployment to be ready)'
+
+  - script: kubectl delete deployment parent-deployment
+    displayName: 'Delete the deployment, but it sits as offline in ADO'
+
+  - script: kubectl apply -f manifests/child-scaledjob.yaml
+    displayName: 'Create the actual scaled job'
