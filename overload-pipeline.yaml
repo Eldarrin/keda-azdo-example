@@ -1,0 +1,13 @@
+trigger:
+  - '*'
+
+pool:
+  name: 'keda-test-pool'
+
+jobs:
+  - job: 'overload-pipeline'
+    strategy:
+      parallel: 10
+    steps:
+      - script: sleep 300
+        displayName: 'Sleep 300 seconds'
