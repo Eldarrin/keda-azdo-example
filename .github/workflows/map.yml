@@ -1,0 +1,66 @@
+name: "Run Pipeline"
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build
+        run: |
+          echo Build
+
+  quality-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Quality Scan
+        run: |
+          echo Quality Scan
+
+  unit-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Unit Test
+        run: |
+          echo Unit Test
+
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: unit-test
+    steps:
+      - name: Integration Test
+        run: |
+          echo Integration Test
+
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: quality-scan
+    steps:
+      - name: Security Scan
+        run: |
+          echo Security Scan
+
+  e2e-test:
+    runs-on: ubuntu-latest
+    needs: integration-test
+    steps:
+      - name: E2E Test
+        run: |
+          echo E2E Test
+          
+  publish:
+    runs-on: ubuntu-latest
+    needs: [build, security-scan, e2e-test, quality-scan, unit-test]
+    steps:
+      - name: Publish
+        run: |
+          echo Publish
+
+  sign-and-attest:
+    runs-on: ubuntu-latest
+    needs: publish
+    steps:
+      - name: Sign and Attest
+        run: |
+          echo Sign and Attest
